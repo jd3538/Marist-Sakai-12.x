@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright (c) 2017, University of Dayton
+  ~
+  ~  Licensed under the Educational Community License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~              http://opensource.org/licenses/ecl2
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+
+<body>
+<wicket:extend>
+	
+	<h1 class="overviewHeader indnt1">
+		<span wicket:id="header-overview" class="overHeaderSpan" />
+	</h1>
+
+	<p class="overviewInstructions">
+		<wicket:container wicket:id="overview-header-info" />
+	</p>
+
+	<form wicket:id="add-attendance-item-form" class="addAttendanceItemForm">
+		<button type="submit" wicket:id="add-attendance-item" class="active"><wicket:message key="attendance.add.button"/></button>
+	</form>
+
+	<table id="overviewTable" class="overviewTable">
+		<thead>
+			<tr>
+				<th><span wicket:id="header-event-name" /></th>
+				<th class="overviewDateCol"><span wicket:id="header-event-date" /></th>
+				<th wicket:id="status-headers" class="overviewStatusCol"><span wicket:id="header-status-name" /></th>
+				<th class="overviewEditCol {sorter: false}"><span wicket:id="header-event-edit" /></th>
+				<th class="overviewPrintCol {sorter: false}"><span wicket:id="header-print-links" /></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr wicket:id="events">
+				<td class="itemNameCol"><a wicket:id="event-link"><span wicket:id="event-name" /></a></td>
+				<td class="overviewDateCol"><span wicket:id="event-date" /></td>
+				<td wicket:id="active-status-stats" class="overviewStatusCol"><span wicket:id="event-stats" /></td>
+				<td class="overviewEditCol">
+					<a wicket:id="event-edit-link">
+						<span class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></span>
+						<span class="sr-only"><wicket:container wicket:id="event-edit-alt"/></span>
+					</a>
+				</td>
+				<td class="overviewPrintCol">
+					<a class="printLink" wicket:id="print-link">
+						<span class="fa fa-print fa-2x" aria-hidden="true"></span>
+						<span class="sr-only"><wicket:container wicket:id="event-print-alt"/></span>
+					</a>
+				</td>
+			</tr>
+			<wicket:enclosure child="no-events">
+				<tr>
+					<td colspan="100" class="noEventsCol">
+						<span wicket:id="no-events" />
+					</td>
+				</tr>
+			</wicket:enclosure>
+		</tbody>
+		<tfoot>
+		<tr>
+			<td colspan="100" style="background-color:#eee;">
+				<form wicket:id="take-attendance-now-form" class="takeAttendanceNowForm">
+					<img id="loadingGif" class="loadingGif" src="images/loading.gif" alt="Loading" style="display: none"/>
+					<input type="submit" wicket:id="take-attendance-now" wicket:message="value:attendance.now.button" class="active"/>
+				</form>
+			</td>
+		</tr>
+		</tfoot>
+	</table>
+
+	<div id="printContainer" class="printContainer" wicket:id="print-container">
+		<span wicket:id="print-panel"/>
+	</div>
+
+	<div id="printMask" class="printMask" style="display:none;"></div>
+
+	<script type="text/javascript" src="javascript/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="javascript/jquery.metadata.js"></script>
+	<script type="text/javascript">
+		$("p.overviewInstructions").width($("#overviewTable").outerWidth());
+		$("#overviewTable").tablesorter({
+			sortList: [[1,0],[0,0]],
+			headers: {
+				1: {
+					sorter: "attendanceDate"
+				}
+			}
+		});
+		$(".takeAttendanceNowForm input").on("click", function(){
+			$("#loadingGif").show();
+			$(this).css('visibility', 'hidden');
+		});
+	</script>
+	<script type="text/javascript" src="javascript/print.js"></script>
+
+</wicket:extend>
+</body>
+</html>

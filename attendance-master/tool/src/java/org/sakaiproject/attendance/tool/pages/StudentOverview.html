@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright (c) 2017, University of Dayton
+  ~
+  ~  Licensed under the Educational Community License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~              http://opensource.org/licenses/ecl2
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+    <div wicket:id="student-overview-header" id="header">
+        <h1 class="overviewHeader indnt1">
+            <span wicket:id="student-overview-title" class="overHeaderSpan" />
+        </h1>
+        <p class="overviewInstructions">
+            <span wicket:id="student-overview-subtitle" />
+        </p>
+    </div>
+
+    <form wicket:id="filter-table-form" class="studentOverviewFilterForm">
+        <span wicket:id="group-choice-label" /> <select wicket:id="group-choice" />
+    </form>
+
+    <table wicket:id="student-overview-stats-table" id="overviewTable" class="overviewTable">
+        <thead>
+        <tr>
+            <th class="studentOverviewNameHeader"><span wicket:id="header-student-name" /></th>
+            <th wicket:id="status-headers" class="overviewStatusCol"><span wicket:id="header-status-name" /></th>
+            <th class="overviewGradeCol {sorter: false}">
+                <span wicket:id="header-grade" />
+                <a wicket:id="settings-link">
+                    <span class="fa fa-cog settings" aria-hidden="true"></span>
+                    <span class="sr-only"><wicket:message key="attendance.icon.grade.settings.alt"/></span>
+                </a>
+                <br />
+                <span wicket:id="total-points" class="totalPointsColHeader" />
+            </th>
+
+        </tr>
+        </thead>
+        <tbody>
+            <tr wicket:id="students">
+                <td class="studentNameCol"><a wicket:id="student-link"><span wicket:id="student-name" /></a></td>
+                <td wicket:id="active-status-stats" class="overviewStatusCol"><span wicket:id="student-stats" /></td>
+                <td class="overviewGradeCol"><wicket:container wicket:id="attendance-grade" /></td>
+            </tr>
+            <wicket:enclosure child="no-students">
+                <tr>
+                    <td colspan="100" class="noStudentsCol">
+                        <span wicket:id="no-students" />
+                        <br />
+                        <span wicket:id="no-students2" />
+                    </td>
+                </tr>
+            </wicket:enclosure>
+        </tbody>
+    </table>
+
+    <script type="text/javascript" src="javascript/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="javascript/jquery.metadata.js"></script>
+    <script type="text/javascript">
+        $("p.overviewInstructions").width($("#overviewTable").outerWidth());
+        $("#overviewTable").tablesorter({
+            sortList: [[0,0]]
+        });
+    </script>
+
+</wicket:extend>
+</body>
+</html>

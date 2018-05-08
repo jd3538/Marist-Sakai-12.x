@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright (c) 2017, University of Dayton
+  ~
+  ~  Licensed under the Educational Community License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~              http://opensource.org/licenses/ecl2
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+    <div wicket:id="header" class="attendanceBreadcrumbs">
+        <h2>
+            <a wicket:id="close-link"><span wicket:id="close-link-text" /></a>
+            <span>></span>
+            <wicket:container wicket:id="event">
+                <a wicket:id="event-link"><span wicket:id="event-link-text"></span></a>
+                <span>></span>
+            </wicket:container>
+            <span wicket:id="student-name" />
+        </h2>
+    </div>
+    <div wicket:id="student-view">
+        <h2>
+            <span wicket:id="student-name" />
+        </h2>
+    </div>
+    <div wicket:id="grade" class="gradeContainer">
+        <div class="containerHeader">
+            <h3 class="containerHeading">
+                <wicket:message key="attendance.header.grade" />
+            </h3>
+        </div>
+        <wicket:container wicket:id="attendance-grade" />
+    </div>
+    <wicket:container wicket:id="statistics"></wicket:container>
+    <div wicket:id="student-view-data" class="takeAttendanceContainer">
+        <div class="takeAttendanceHeader">
+            <h3 class="takeAttendanceHeader">
+                <span wicket:id="take-attendance-header"/>
+            </h3>
+        </div>
+
+        <table id="takeAttendanceTable" class="takeAttendanceTable">
+            <thead>
+            <tr class="div-table-row">
+                <th class="takeAttendanceNameHeader">
+                    <span wicket:id="event-name-header" />
+                </th>
+                <th class="takeAttendanceDateHeader">
+                    <span wicket:id="event-date-header" />
+                </th>
+                <th class="takeAttendanceStatusCol">
+                    <span wicket:id="header"/>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr wicket:id="records" class="div-table-row">
+                <td>
+                    <a wicket:id="event-link"><span wicket:id="record-name"></span></a>
+                </td>
+                <td class="takeAttendanceDateHeader">
+                    <span wicket:id="event-date" />
+                </td>
+                <td>
+                    <wicket:container wicket:id="record" />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <script type="text/javascript" src="javascript/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript">
+            $("#takeAttendanceTable").tablesorter({
+                sortList: [[1,0],[0,0]],
+                headers: {
+                    1: {
+                        sorter: "attendanceDate"
+                    },
+                    2: {
+                        sorter: false
+                    }
+                }
+            });
+        </script>
+    </div>
+    <label wicket:id="student-view-hidden" hidden id="studentView" aria-hidden="true"/>
+</wicket:extend>
+</body>
+</html>
