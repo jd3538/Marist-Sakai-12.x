@@ -25,12 +25,13 @@
 	
 	<packaging>pom</packaging>
 	<version>20180412</version>
-	
-	<parent>
-    	<groupId>org.sakaiproject</groupId>
-    	<artifactId>master</artifactId>
-    	<version>12-SNAPSHOT</version>
-  	</parent>
+
+        <parent>
+        <groupId>org.sakaiproject</groupId>
+        <artifactId>master</artifactId>
+	<version>12-SNAPSHOT</version>
+	<relativePath>../master/pom.xml</relativePath>
+	</parent>
 
 	<developers>
 		<developer>
