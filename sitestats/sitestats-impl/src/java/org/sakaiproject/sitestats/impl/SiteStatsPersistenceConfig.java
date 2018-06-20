@@ -1,8 +1,8 @@
 package org.sakaiproject.sitestats.impl;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
-import org.jfree.util.Log;
 import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.springframework.orm.hibernate.AdditionalHibernateMappings;
 import org.sakaiproject.springframework.orm.hibernate.impl.AdditionalHibernateMappingsImpl;
@@ -12,11 +12,12 @@ import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
+@Slf4j
 public class SiteStatsPersistenceConfig {
 
     @Lazy
@@ -33,6 +34,7 @@ public class SiteStatsPersistenceConfig {
 
     private PlatformTransactionManager siteStatsTransactionManager;
     private SessionFactory siteStatsSessionFactory;
+    private HikariDataSource externalDataSource;
 
     @Bean(name = "org.sakaiproject.sitestats.SiteStatsTransactionManager")
     public PlatformTransactionManager getSiteStatsTransactionManager() throws IOException {
@@ -91,17 +93,24 @@ public class SiteStatsPersistenceConfig {
         };
     }
 
+    @PreDestroy
+    public void close() {
+        if (externalDataSource != null && !externalDataSource.isClosed()) {
+            log.info("SiteStats closing external database with pool name {}", externalDataSource.getPoolName());
+            externalDataSource.close();
+        }
+    }
+
     private Properties getHibernateExternalProperties() {
         Properties p = new Properties();
         p.setProperty("hibernate.dialect", serverConfigurationService.getString("sitestats.externalDb.hibernate.dialect", "org.hibernate.dialect.HSQLDialect"));
         String autoDdl = serverConfigurationService.getString("sitestats.externalDb.auto.ddl", "update");
         if ("true".equals(autoDdl)) {
-        	autoDdl = "update";
-        	Log.info("Auto DDL has been set to update based on old value of true, please update the property sitestats.externalDb.auto.ddl");
-        }
-        else if ("false".equals(autoDdl)) {
-        	autoDdl = "validate";
-        	Log.info("Auto DDL has been set to validate based on old value of false, please update the property sitestats.externalDb.auto.ddl");
+            autoDdl = "update";
+            log.info("Auto DDL has been set to update based on old value of true, please update the property sitestats.externalDb.auto.ddl");
+        } else if ("false".equals(autoDdl)) {
+            autoDdl = "validate";
+            log.info("Auto DDL has been set to validate based on old value of false, please update the property sitestats.externalDb.auto.ddl");
         }
 
         p.setProperty("hibernate.hbm2ddl.auto", autoDdl);
@@ -113,15 +122,17 @@ public class SiteStatsPersistenceConfig {
         return p;
     }
 
-    private DataSource getExternalDataSource() {
-
-        HikariDataSource hds = new HikariDataSource();
-        hds.setUsername(serverConfigurationService.getString("sitestats.externalDb.username", serverConfigurationService.getString("username@org.sakaiproject.sitestats.externalDbDataSource", "sa")));
-        hds.setPassword(serverConfigurationService.getString("sitestats.externalDb.password", serverConfigurationService.getString("password@org.sakaiproject.sitestats.externalDbDataSource", "")));
-        hds.setJdbcUrl(serverConfigurationService.getString("sitestats.externalDb.jdbcUrl", serverConfigurationService.getString("url@org.sakaiproject.sitestats.externalDbDataSource","jdbc:hsqldb:mem:sitestats_db")));
-        hds.setDriverClassName(serverConfigurationService.getString("sitestats.externalDb.driverClassName", serverConfigurationService.getString("driverClassName@org.sakaiproject.sitestats.externalDbDataSource","org.hsqldb.jdbcDriver")));
-        hds.setConnectionTestQuery(serverConfigurationService.getString("sitestats.externalDb.connectionTestQuery", "SELECT 1"));
-        hds.setPoolName(serverConfigurationService.getString("sitestats.externalDb.poolName", "externalDBCP"));
-        return hds;
+    private HikariDataSource getExternalDataSource() {
+        if (externalDataSource == null) {
+            externalDataSource = new HikariDataSource();
+            externalDataSource.setUsername(serverConfigurationService.getString("sitestats.externalDb.username", serverConfigurationService.getString("username@org.sakaiproject.sitestats.externalDbDataSource", "sa")));
+            externalDataSource.setPassword(serverConfigurationService.getString("sitestats.externalDb.password", serverConfigurationService.getString("password@org.sakaiproject.sitestats.externalDbDataSource", "")));
+            externalDataSource.setJdbcUrl(serverConfigurationService.getString("sitestats.externalDb.jdbcUrl", serverConfigurationService.getString("url@org.sakaiproject.sitestats.externalDbDataSource", "jdbc:hsqldb:mem:sitestats_db")));
+            externalDataSource.setDriverClassName(serverConfigurationService.getString("sitestats.externalDb.driverClassName", serverConfigurationService.getString("driverClassName@org.sakaiproject.sitestats.externalDbDataSource", "org.hsqldb.jdbcDriver")));
+            externalDataSource.setConnectionTestQuery(serverConfigurationService.getString("sitestats.externalDb.connectionTestQuery", "SELECT 1"));
+            externalDataSource.setPoolName(serverConfigurationService.getString("sitestats.externalDb.poolName", "externalDBCP"));
+            log.info("SiteStats configuring external database with pool name {}", externalDataSource.getPoolName());
+        }
+        return externalDataSource;
     }
 }
